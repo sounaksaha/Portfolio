@@ -1,36 +1,45 @@
 <?php
- 
 
-  // Replace contact@example.com with your real receiving email address
-  $receiving_email_address = 'sahasounak97@gmail.com';
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Collect form data
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $subject = $_POST['subject'];
+    $message = $_POST['message'];
 
-  if( file_exists($php_email_form = '../assets/vendor/php-email-form/php-email-form.php' )) {
-    include( $php_email_form );
-  } else {
-    die( 'Unable to load the "PHP Email Form" Library!');
-  }
+    // Replace this email address with your own
+    $to = 'sahasounak97@gmail.com';
 
-  $contact = new PHP_Email_Form;
-  $contact->ajax = true;
-  
-  $contact->to = $receiving_email_address;
-  $contact->from_name = $_POST['name'];
-  $contact->from_email = $_POST['email'];
-  $contact->subject = $_POST['subject'];
+    // Create email headers
+    $headers = "From: $email\r\n";
+    $headers .= "Reply-To: $email\r\n";
+    $headers .= "Content-Type: text/html\r\n";
 
-  // Uncomment below code if you want to use SMTP to send emails. You need to enter your correct SMTP credentials
-  /*
-  $contact->smtp = array(
-    'host' => 'example.com',
-    'username' => 'example',
-    'password' => 'pass',
-    'port' => '587'
-  );
-  */
+    // Compose the email message
+    $email_message = "
+        <html>
+        <body>
+            <h2>New Contact Form Submission</h2>
+            <p><strong>Name:</strong> $name</p>
+            <p><strong>Email:</strong> $email</p>
+            <p><strong>Subject:</strong> $subject</p>
+            <p><strong>Message:</strong></p>
+            <p>$message</p>
+        </body>
+        </html>
+    ";
 
-  $contact->add_message( $_POST['name'], 'From');
-  $contact->add_message( $_POST['email'], 'Email');
-  $contact->add_message( $_POST['message'], 'Message', 10);
+    // Send email
+    if (mail($to, $subject, $email_message, $headers)) {
+        // If the email is sent successfully
+        echo "success";
+    } else {
+        // If there's an error sending the email
+        echo "error";
+    }
+} else {
+    // If the form is not submitted using POST method
+    echo "Method not allowed";
+}
 
-  echo $contact->send();
 ?>
